@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Project Model Canvas</title>
+<style>
+:root{
+ --green:#27a955;--yellow:#f2ad00;--blue:#188fd3;--purple:#8743c7;--red:#ef3e43;
+ --ink:#10264a;--muted:#5e7188;--line:#d9e2ea;--bg:#edf3f8;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);font-family:Arial,Helvetica,sans-serif;color:var(--ink)}
+.toolbar{position:sticky;top:0;z-index:30;background:#fff;border-bottom:1px solid var(--line);
+ padding:8px 14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.toolbar b{font-size:14px}.actions{display:flex;gap:7px;flex-wrap:wrap}
+button{font:inherit;font-weight:700;border:0;border-radius:8px;padding:8px 11px;cursor:pointer}
+.save{background:#096dcc;color:#fff}.clear{background:#edf2f7;color:#24415e}.print{background:#173f72;color:#fff}
+.email{background:#0f8b6d;color:#fff}
+.download{background:#44566c;color:#fff}
+.authorship{margin-top:6px;text-align:right;font-size:8px;color:#7b8a98;font-style:italic}
+.sheet{width:min(1560px,calc(100% - 18px));margin:10px auto 24px;background:#fff;padding:12px;
+ box-shadow:0 7px 24px #2342;border-radius:12px}
+.top{display:grid;grid-template-columns:1.6fr 2fr .9fr;gap:12px;align-items:center;margin-bottom:9px}
+.brand h1{margin:0;font-size:31px;letter-spacing:-1px}.brand h1 span{color:#0876cc}
+.brand p{margin:3px 0 0;font-size:11px;letter-spacing:1.2px}
+.meta{display:grid;grid-template-columns:1.2fr 1fr;gap:7px}
+.field label{display:block;font-size:10px;font-weight:800;margin-bottom:3px}
+.field input{width:100%;height:30px;border:1px solid #a9c4d9;border-radius:5px;background:#f5fbff;padding:5px 8px}
+.quote{background:#e3f5ff;border-radius:8px;padding:12px;text-align:center;font-size:13px;line-height:1.35}
+.canvas{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;align-items:stretch}
+.group{display:flex;flex-direction:column;gap:7px;min-width:0;align-self:start}
+.group-title{color:#fff;text-align:center;padding:9px 5px;border-radius:8px 8px 4px 4px}
+.group-title strong{display:block;font-size:22px}.group-title small{font-weight:700}
+.g-green .group-title{background:var(--green)}.g-yellow .group-title{background:var(--yellow)}
+.g-blue .group-title{background:var(--blue)}.g-purple .group-title{background:var(--purple)}
+.g-red .group-title{background:var(--red)}
+.card{border:1.5px solid;border-radius:8px;padding:9px;display:flex;flex-direction:column;min-height:205px;flex:0 0 auto;overflow:visible}
+.g-green .card{border-color:#65ce82;background:#f4fff5}.g-yellow .card{border-color:#f2c14a;background:#fffdf1}
+.g-blue .card{border-color:#63b9eb;background:#f2fbff}.g-purple .card{border-color:#b785ea;background:#fbf6ff}
+.g-red .card{border-color:#ff8588;background:#fff5f5}
+.card-head{display:flex;align-items:center;gap:7px}.icon{font-size:21px}.card h3{margin:0;font-size:15px;flex:1}
+.help{width:22px;height:22px;padding:0;border-radius:50%;color:#fff;background:#60758b}
+.g-green .help{background:#188643}.g-yellow .help{background:#c68700}.g-blue .help{background:#0873b7}
+.g-purple .help{background:#6e2da9}.g-red .help{background:#ce2e33}
+.prompt{font-size:11px;line-height:1.28;margin:6px 0;color:#263e58}.extra{display:none;font-size:10px;line-height:1.3;
+ padding:6px;border-radius:5px;background:#fff;border:1px dashed #a9b8c6;margin-bottom:6px}.card.open .extra{display:block}
+.notes{display:flex;flex-wrap:wrap;gap:6px;align-content:flex-start;flex:0 0 auto}
+.note{position:relative;width:calc(50% - 3px);min-height:72px;background:#fff0a6;border:1px solid #e5d268;
+ padding:8px 20px 8px 8px;box-shadow:0 3px 6px #0002;transform:rotate(-.25deg)}
+.note:nth-child(even){transform:rotate(.3deg)}.g-green .note{background:#d7f6ae}.g-yellow .note{background:#ffe99c}
+.g-blue .note{background:#bce5fb}.g-purple .note{background:#dec1fa}.g-red .note{background:#ffc7c8}
+.note-text{outline:none;min-height:54px;font-size:11px;line-height:1.25;white-space:pre-wrap;overflow-wrap:anywhere}
+.note-text:empty:before{content:"Digite uma ideia...";color:#667766}
+.del{position:absolute;right:3px;top:3px;width:17px;height:17px;padding:0;border-radius:50%;font-size:12px;background:#ffffffaa;color:#667}
+.add{align-self:center;margin-top:7px;padding:5px 9px;background:#fff;border:1px solid currentColor;font-size:10px;flex:0 0 auto;position:relative;z-index:2}
+.g-green .add{color:#168642}.g-yellow .add{color:#b77700}.g-blue .add{color:#0873b7}.g-purple .add{color:#702cae}.g-red .add{color:#d12c31}
+.bottom{display:flex;justify-content:space-between;gap:10px;margin-top:9px;align-items:center}
+.status{font-size:11px;color:#0b6fc0;font-weight:700}.tip{font-size:10px;background:#e8f6ff;padding:7px 10px;border-radius:7px}
+.reference{margin-top:8px;padding-top:6px;border-top:1px solid var(--line);font-size:8.5px;color:#465b70;line-height:1.3}
+@media(max-width:800px){
+ .toolbar{align-items:flex-start}.toolbar b{display:none}.actions{width:100%}.actions button{flex:1;font-size:11px;padding:8px 4px}
+ .sheet{width:100%;margin:0;padding:9px;border-radius:0;box-shadow:none}.top{grid-template-columns:1fr}
+ .brand h1{font-size:27px}.quote{display:none}.meta{grid-template-columns:1fr 1fr}
+ .canvas{display:block}.group{margin-bottom:14px}.group-title{position:sticky;top:49px;z-index:15}
+ .card{min-height:230px;margin-bottom:7px}.note{min-height:90px}.note-text{min-height:70px;font-size:13px}
+ .add{font-size:12px;padding:8px 12px}.prompt{font-size:12px}.bottom{display:block}.tip{margin-top:7px}
+}
+
+/* Layout fixo usado na geração automática do PDF, independente do tamanho da tela */
+body.pdf-export{background:#fff!important}
+body.pdf-export .sheet{
+  width:1500px!important;max-width:none!important;margin:0!important;padding:12px!important;
+  box-shadow:none!important;border-radius:0!important
+}
+body.pdf-export .top{display:grid!important;grid-template-columns:1.55fr 2fr .9fr!important;gap:10px!important;margin-bottom:8px!important}
+body.pdf-export .canvas{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:6px!important;align-items:start!important}
+body.pdf-export .group{display:flex!important;flex-direction:column!important;gap:6px!important;margin:0!important;min-width:0!important;align-self:start!important}
+body.pdf-export .group-title{position:static!important;padding:7px 4px!important}
+body.pdf-export .group-title strong{font-size:18px!important}
+body.pdf-export .group-title small{font-size:10px!important}
+body.pdf-export .card{min-height:0!important;flex:0 0 auto!important;padding:7px!important;margin:0!important;break-inside:avoid!important;overflow:visible!important}
+body.pdf-export .card h3{font-size:13px!important}
+body.pdf-export .icon{font-size:17px!important}
+body.pdf-export .prompt{font-size:10px!important;line-height:1.22!important;margin:4px 0!important}
+body.pdf-export .notes{gap:4px!important;flex:0 0 auto!important}
+body.pdf-export .note{width:calc(50% - 2px)!important;min-height:55px!important;padding:6px!important;box-shadow:none!important;transform:none!important}
+body.pdf-export .note-text{min-height:42px!important;font-size:10px!important;line-height:1.18!important}
+body.pdf-export .reference{font-size:8px!important;margin-top:6px!important;padding-top:4px!important}
+body.pdf-export .help,body.pdf-export .add,body.pdf-export .del,body.pdf-export .bottom,body.pdf-export .authorship{display:none!important}
+
+@page{size:A4 landscape;margin:5mm}
+@media print{
+ body{background:#fff!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
+ .toolbar,.help,.add,.del,.bottom,.authorship{display:none!important}
+ .sheet{width:287mm!important;max-width:none!important;margin:0!important;padding:0!important;box-shadow:none!important;border-radius:0!important}
+ .top{display:grid!important;grid-template-columns:1.55fr 2fr .9fr!important;gap:2mm!important;margin-bottom:2mm!important}
+ .brand h1{font-size:15pt!important}.brand p{font-size:6.5pt!important}
+ .quote{display:block!important;font-size:7.5pt!important;padding:2mm!important}
+ .meta{display:grid!important;grid-template-columns:1.2fr 1fr!important;gap:1.5mm!important}
+ .field label{font-size:6.5pt!important}.field input{height:7mm!important;font-size:7pt!important;padding:1mm 1.5mm!important}
+ .canvas{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:1.5mm!important;align-items:start!important}
+ .group{display:flex!important;flex-direction:column!important;gap:1.5mm!important;margin:0!important;min-width:0!important;align-self:start!important}
+ .group-title{position:static!important;top:auto!important;padding:2mm 1mm!important;border-radius:2mm 2mm 1mm 1mm!important}
+ .group-title strong{font-size:10pt!important}.group-title small{font-size:6pt!important}
+ .card{min-height:0!important;flex:0 0 auto!important;padding:1.5mm!important;margin:0!important;border-radius:1.5mm!important;break-inside:avoid!important;page-break-inside:avoid!important;overflow:visible!important}
+ .card-head{gap:1mm!important}.icon{font-size:9pt!important}.card h3{font-size:7.5pt!important}
+ .prompt{font-size:6.5pt!important;line-height:1.15!important;margin:1mm 0!important}.extra{display:none!important}
+ .notes{display:flex!important;gap:.8mm!important;flex:0 0 auto!important}
+ .note{width:calc(50% - .4mm)!important;min-height:9mm!important;padding:1.2mm!important;box-shadow:none!important;transform:none!important}
+ .note-text{min-height:6.5mm!important;font-size:6.5pt!important;line-height:1.12!important}.note-text:empty:before{content:""!important}
+ .reference{font-size:6pt!important;line-height:1.2!important;margin-top:1.5mm!important;padding-top:1mm!important}
+}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js">
+function downloadToolFile(ev){
+  if(ev) ev.preventDefault();
+  const a=document.createElement("a");
+  a.href=window.location.href.split("#")[0].split("?")[0];
+  a.download="project-model-canvas.html";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+}
+
+</script>
+</head>
+<body>
+<div class="toolbar"><b>Project Model Canvas • Preenchível</b><div class="actions">
+<button class="save" onclick="save(true)">Salvar no navegador</button>
+<button class="clear" onclick="clearAll()">Limpar Canvas</button>
+<button class="print" onclick="window.print()">Imprimir / Salvar em PDF</button>
+<button class="email" onclick="sendByEmail()">✉ Enviar por e-mail</button>
+<a class="download" href="#" onclick="downloadToolFile(event)" download="project-model-canvas.html" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center">⬇ Baixar ferramenta</a>
+</div></div>
+
+<main class="sheet">
+<section class="top">
+ <div class="brand"><h1>PROJECT MODEL <span>CANVAS</span></h1><p>PLANEJE IDEIAS. CONECTE PESSOAS. TRANSFORME REALIDADES.</p></div>
+ <div class="meta">
+  <div class="field"><label>Nome do projeto</label><input id="project"></div>
+  <div class="field"><label>Equipe</label><input id="team"></div>
+  <div class="field"><label>Turma</label><input id="classroom"></div>
+  <div class="field"><label>Data</label><input id="date" type="date"></div>
+ </div>
+ <div class="quote">“Grandes projetos<br>começam com boas perguntas.”</div>
+</section>
+
+<section class="canvas" id="canvas"></section>
+<div class="bottom"><span class="status" id="status">Os dados são salvos automaticamente neste navegador.</span>
+<span class="tip">💡 Clique no <b>?</b> de cada bloco para ver orientações.</span></div>
+<div class="reference"><b>Referência:</b> COSTA, Adriana Bastos da; PEREIRA, Fernanda da Silva. <i>Fundamentos de gestão de projetos: da teoria à prática - como gerenciar projetos de sucesso.</i> 1. ed. Curitiba: Intersaberes, 2019. E-book. p. 178–188.</div>
+<div class="authorship">Idealizado por: Prof. Gabriel Velini</div>
+</main>
+
+<script>
+const groups=[
+ {cls:"g-green",title:"POR QUÊ?",sub:"Justificativa, objetivos e benefícios",cards:[
+  ["justificativa","📄","Justificativa","Qual é o problema ou a oportunidade que o projeto pretende resolver? Por que ele é importante?","Descreva a situação que motiva o projeto e as razões que justificam sua realização."],
+  ["objetivo","📊","Objetivo SMART","O que se pretende alcançar? Defina um objetivo específico, mensurável, atingível, relevante e temporal.","Procure escrever um objetivo claro, verificável e com prazo definido."],
+  ["beneficios","💎","Benefícios","Quais são os resultados esperados? Que valor o projeto trará?","Pense nos ganhos e mudanças positivas esperados após a realização do projeto."]
+ ]},
+ {cls:"g-yellow",title:"O QUÊ?",sub:"Produto e requisitos",cards:[
+  ["produto","📦","Produto","Qual é o produto, serviço ou resultado final do projeto? O que será entregue?","Defina a principal entrega que materializa o resultado do projeto."],
+  ["requisitos","📋","Requisitos","Quais são as principais condições ou características que o produto deve atender?","Registre características, critérios de qualidade e condições necessárias para a entrega."]
+ ]},
+ {cls:"g-blue",title:"QUEM?",sub:"Partes interessadas e equipe",cards:[
+  ["stakeholders","👥","Stakeholders","Quem são as partes interessadas? Quem será impactado pelo projeto? Quais são suas expectativas?","Considere clientes, usuários, patrocinadores, fornecedores, gestores e demais pessoas ou grupos envolvidos."],
+  ["equipe","👤","Equipe","Quem irá executar o projeto? Quais são as principais funções e responsabilidades?","Identifique os integrantes e, quando necessário, indique responsabilidades ou papéis."]
+ ]},
+ {cls:"g-purple",title:"COMO?",sub:"Estratégias, entregas e limites",cards:[
+  ["premissas","⚙️","Premissas","Quais são as condições que consideramos verdadeiras para o sucesso do projeto?","Registre condições assumidas como verdadeiras no planejamento, mesmo que ainda precisem ser confirmadas."],
+  ["entregas","🗂️","Grupo de Entregas","Quais são os principais pacotes de trabalho ou entregas do projeto?","Divida o produto final em grandes entregas ou conjuntos de trabalho necessários para concluí-lo."],
+  ["restricoes","⚠️","Restrições","Quais são os limites do projeto? O que não pode ser feito?","Considere limites de tempo, orçamento, recursos, escopo, regras ou outras condições que restringem o projeto."]
+ ]},
+ {cls:"g-red",title:"QUANDO E QUANTO?",sub:"Riscos, prazos e custos",cards:[
+  ["riscos","⚠️","Riscos","O que pode acontecer e comprometer o projeto? Como podemos responder?","Identifique eventos incertos que podem afetar os resultados e pense em formas de prevenção ou resposta."],
+  ["tempo","📅","Linha do Tempo","Quais são as principais etapas, marcos e datas do projeto?","Organize os principais momentos do projeto em uma sequência temporal."],
+  ["custos","🪙","Custos","Quais são os principais custos envolvidos? Qual é o orçamento estimado?","Considere pessoas, materiais, serviços, equipamentos, deslocamentos e outros recursos financeiros."]
+ ]}
+];
+const root=document.getElementById("canvas");
+groups.forEach(g=>{
+ const sec=document.createElement("section"); sec.className="group "+g.cls;
+ sec.innerHTML=`<div class="group-title"><strong>${g.title}</strong><small>${g.sub}</small></div>`;
+ g.cards.forEach(c=>{
+  const card=document.createElement("article"); card.className="card"; card.dataset.key=c[0];
+  card.innerHTML=`<div class="card-head"><span class="icon">${c[1]}</span><h3>${c[2]}</h3><button class="help" title="Orientações" onclick="this.closest('.card').classList.toggle('open')">?</button></div>
+  <div class="prompt">${c[3]}</div><div class="extra">${c[4]}</div><div class="notes"></div>
+  <button class="add" onclick="addNote(this)">＋ Adicionar ideia</button>`;
+  sec.appendChild(card);
+ }); root.appendChild(sec);
+});
+const KEY="projectModelCanvas_v1", ids=["project","team","classroom","date"];
+function noteEl(text=""){
+ const n=document.createElement("div");n.className="note";
+ n.innerHTML=`<button class="del" title="Excluir" onclick="this.parentElement.remove();save()">×</button><div class="note-text" contenteditable="true"></div>`;
+ n.querySelector(".note-text").innerText=text;return n;
+}
+function addNote(btn,text=""){const n=noteEl(text),area=btn.closest(".card").querySelector(".notes");area.appendChild(n);if(!text)n.querySelector(".note-text").focus();save()}
+function data(){const d={};ids.forEach(id=>d[id]=document.getElementById(id).value);document.querySelectorAll(".card").forEach(c=>d[c.dataset.key]=[...c.querySelectorAll(".note-text")].map(x=>x.innerText));return d}
+function save(show=false){localStorage.setItem(KEY,JSON.stringify(data()));if(show){document.getElementById("status").textContent="Canvas salvo neste navegador.";setTimeout(()=>document.getElementById("status").textContent="Os dados são salvos automaticamente neste navegador.",1500)}}
+function load(){let d={};try{d=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){}
+ ids.forEach(id=>{if(d[id]!=null)document.getElementById(id).value=d[id]});
+ document.querySelectorAll(".card").forEach(c=>{const a=c.querySelector(".notes"),arr=d[c.dataset.key];if(Array.isArray(arr)&&arr.length)arr.forEach(t=>a.appendChild(noteEl(t)));else a.appendChild(noteEl(""))})
+}
+function clearAll(){if(!confirm("Deseja apagar todo o preenchimento deste Project Model Canvas?"))return;localStorage.removeItem(KEY);ids.forEach(id=>document.getElementById(id).value="");document.querySelectorAll(".notes").forEach(a=>{a.innerHTML="";a.appendChild(noteEl(""))});save()}
+async function ensureHtml2Pdf(){
+  if(window.html2pdf) return true;
+  return new Promise(resolve=>{
+    const sc=document.createElement("script");
+    sc.src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+    sc.onload=()=>resolve(true);
+    sc.onerror=()=>resolve(false);
+    document.head.appendChild(sc);
+  });
+}
+
+async function sendByEmail(){
+  save();
+  const statusEl=document.getElementById("status");
+  const previous=statusEl ? statusEl.textContent : "";
+  const projectName=(document.getElementById("project")?.value || "Project_Model_Canvas").trim();
+  const safeName=projectName.replace(/[^a-zA-Z0-9À-ÿ_-]+/g,"_");
+  const filename="Project_Model_Canvas_"+safeName+".pdf";
+  const element=document.querySelector(".sheet");
+
+  if(!window.html2pdf){
+    alert("Não foi possível carregar o gerador de PDF. Verifique a conexão com a internet ou use o botão “Imprimir / Salvar em PDF”.");
+    return;
+  }
+
+  try{
+    if(statusEl) statusEl.textContent="Gerando PDF...";
+    document.body.classList.add("pdf-export");
+    await new Promise(r=>setTimeout(r,180));
+
+    const opt={
+      margin:[4,4,4,4],
+      filename:filename,
+      image:{type:"jpeg",quality:0.98},
+      html2canvas:{
+        scale:1.6,
+        useCORS:true,
+        backgroundColor:"#ffffff",
+        windowWidth:1600,
+        scrollX:0,
+        scrollY:0
+      },
+      jsPDF:{unit:"mm",format:"a4",orientation:"landscape",compress:true},
+      pagebreak:{mode:["css","legacy"]}
+    };
+
+    const blob=await html2pdf().set(opt).from(element).outputPdf("blob");
+    document.body.classList.remove("pdf-export");
+
+    const file=new File([blob],filename,{type:"application/pdf"});
+
+    // Em celulares e navegadores compatíveis, abre o compartilhamento com o PDF anexado.
+    if(navigator.share && navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({
+        title:"Project Model Canvas",
+        text:"Segue o Project Model Canvas elaborado.",
+        files:[file]
+      });
+      if(statusEl) statusEl.textContent="PDF pronto para compartilhamento.";
+      setTimeout(()=>{if(statusEl) statusEl.textContent=previous;},2500);
+      return;
+    }
+
+    // No desktop, navegadores não permitem anexar arquivo automaticamente ao e-mail.
+    // Baixa o PDF e abre o programa padrão de e-mail com assunto e mensagem preenchidos.
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");
+    a.href=url;
+    a.download=filename;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),3000);
+
+    const mailBody="Segue o Project Model Canvas elaborado.\n\nO PDF foi gerado e baixado neste dispositivo. Anexe o arquivo “"+filename+"” a esta mensagem.";
+    window.location.href="mailto:?subject="+encodeURIComponent("Project Model Canvas")+"&body="+encodeURIComponent(mailBody);
+
+    if(statusEl) statusEl.textContent="PDF gerado. Agora basta anexá-lo ao e-mail aberto.";
+    setTimeout(()=>{if(statusEl) statusEl.textContent=previous;},4500);
+  }catch(err){
+    document.body.classList.remove("pdf-export");
+    if(err && err.name==="AbortError"){
+      if(statusEl) statusEl.textContent=previous;
+      return;
+    }
+    console.error(err);
+    alert("Não foi possível gerar o PDF automaticamente. Use “Imprimir / Salvar em PDF” como alternativa.");
+    if(statusEl) statusEl.textContent=previous;
+  }
+}
+
+document.addEventListener("input",e=>{if(e.target.matches("input,.note-text"))save()});load();
+</script>
+</body></html>
