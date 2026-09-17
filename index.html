@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ferramentas Educacionais | Gabriel Velini</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f7f9fc;
+      color: #1f2937;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      text-align: center;
+      padding: 70px 20px 45px;
+    }
+
+    header h1 {
+      font-size: 2.4rem;
+      color: #123f68;
+      margin-bottom: 12px;
+    }
+
+    header p {
+      color: #64748b;
+      font-size: 1.05rem;
+      max-width: 600px;
+      margin: auto;
+      line-height: 1.6;
+    }
+
+    main {
+      width: 90%;
+      max-width: 900px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 24px;
+      flex: 1;
+    }
+
+    .card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 16px;
+      padding: 32px;
+      text-decoration: none;
+      color: inherit;
+      transition: 0.2s ease;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.04);
+    }
+
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 24px rgba(0,0,0,0.08);
+      border-color: #b8cbe0;
+    }
+
+    .icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 12px;
+      background: #edf5fb;
+      color: #1769a0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 22px;
+    }
+
+    .card h2 {
+      color: #123f68;
+      font-size: 1.35rem;
+      margin-bottom: 12px;
+    }
+
+    .card p {
+      color: #64748b;
+      line-height: 1.6;
+      font-size: 0.95rem;
+      margin-bottom: 24px;
+    }
+
+    .acessar {
+      color: #1769a0;
+      font-weight: bold;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      text-align: center;
+      padding: 45px 20px 25px;
+      color: #94a3b8;
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding-top: 45px;
+      }
+
+      header h1 {
+        font-size: 1.9rem;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Ferramentas Educacionais</h1>
+    <p>
+      Recursos digitais para apoiar atividades de planejamento,
+      gestão e desenvolvimento de projetos.
+    </p>
+  </header>
+
+  <main>
+
+    <a class="card" href="/5w2h/">
+      <div class="icon">5W</div>
+      <h2>Plano de Ação 5W2H</h2>
+      <p>
+        Organize ações definindo o que será feito, por quê,
+        onde, quando, por quem, como e quanto custará.
+      </p>
+      <span class="acessar">Acessar ferramenta →</span>
+    </a>
+
+    <a class="card" href="/canvas/">
+      <div class="icon">PM</div>
+      <h2>Project Model Canvas</h2>
+      <p>
+        Estruture projetos visualmente, organizando objetivos,
+        entregas, recursos, riscos e demais elementos essenciais.
+      </p>
+      <span class="acessar">Acessar ferramenta →</span>
+    </a>
+
+  </main>
+
+  <footer>
+    Gabriel Velini • Ferramentas Educacionais
+  </footer>
+
+</body>
+</html>
